@@ -17,7 +17,6 @@ jobs:
 # echo workflow inputs
     - name: Echo Workflow Inputs
       run: |
-        echo "VM Name: "
-        echo "Location: "
-
+        echo "VM Name: ${{ github.event.inputs.vmname }}"
+        echo "Location: ${{ github.event.inputs.location }}"
 
