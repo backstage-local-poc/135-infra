@@ -1,0 +1,23 @@
+name: Deploy Terraform
+
+on:
+  workflow_dispatch:
+    # Define inputs that are required for the manual trigger
+    inputs:
+      vmname:
+        description: 'Name of the ECS cluster'  # What's this input for?
+        required: true  # Is it optional or required?
+      location:
+        description: 'AWS Region for the cluster'
+        required: true
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+# echo workflow inputs
+    - name: Echo Workflow Inputs
+      run: |
+        echo "VM Name: "
+        echo "Location: "
+
+
