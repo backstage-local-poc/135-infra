@@ -2,21 +2,40 @@ name: Deploy Terraform
 
 on:
   workflow_dispatch:
-    # Define inputs that are required for the manual trigger
     inputs:
-      vmname:
-        description: 'Name of the ECS cluster'  # What's this input for?
-        required: true  # Is it optional or required?
-      location:
-        description: 'AWS Region for the cluster'
+      instanceName:
+        description: 'Name of the VM'
         required: true
+      location:
+        description: 'Azure region'
+        required: true
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    env:
+      ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+      ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
+      ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+      ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
     steps:
-# echo workflow inputs
-    - name: Echo Workflow Inputs
-      run: |
-        echo "VM Name: ${{ github.event.inputs.vmname }}"
-        echo "Location: ${{ github.event.inputs.location }}"
+      - uses: actions/checkout@v3
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
 
+      - name : Log Inputs
+        run: |
+          echo "Instance Name: ${{ github.event.inputs.instanceName }}"
+          echo "Location: ${{ github.event.inputs.location }}"
+          echo "ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}"
+          echo "ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}"
+          echo "ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}"
+          echo "ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}"
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Terraform Plan
+        run: terraform plan -var="vm_name=${{ github.event.inputs.instanceName }}" -var="location=${{ github.event.inputs.location }}"
+
+      - name: Terraform Apply
+        run: terraform apply -auto-approve -var="vm_name=${{ github.event.inputs.instanceName }}" -var="location=${{ github.event.inputs.location }}"
